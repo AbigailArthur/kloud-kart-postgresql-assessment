@@ -1,68 +1,46 @@
---- 1. Orders referencing customers that do not exist
-SELECT
-    o.order_id,
-    o.customer_id
+﻿-- 1. Orders referencing customers that do not exist
+SELECT o.order_id, o.customer_id
 FROM orders o
-LEFT JOIN customers c
-    ON o.customer_id = c.customer_id
-WHERE c.customer_id IS NULL;
-
+LEFT JOIN customers c ON o.customer_id = c.customer_id
+WHERE c.customer_id IS NULL
+ORDER BY o.order_id;
 
 -- 2. Order items referencing orders that do not exist
-SELECT
-    oi.order_item_id,
-    oi.order_id
+SELECT oi.order_item_id, oi.order_id
 FROM order_items oi
-LEFT JOIN orders o
-    ON oi.order_id = o.order_id
-WHERE o.order_id IS NULL;
-
+LEFT JOIN orders o ON oi.order_id = o.order_id
+WHERE o.order_id IS NULL
+ORDER BY oi.order_item_id;
 
 -- 3. Order items referencing products that do not exist
-SELECT
-    oi.order_item_id,
-    oi.product_id
+SELECT oi.order_item_id, oi.product_id
 FROM order_items oi
-LEFT JOIN products p
-    ON oi.product_id = p.product_id
-WHERE p.product_id IS NULL;
-
+LEFT JOIN products p ON oi.product_id = p.product_id
+WHERE p.product_id IS NULL
+ORDER BY oi.order_item_id;
 
 -- 4. Products referencing categories that do not exist
-SELECT
-    p.product_id,
-    p.product_name,
-    p.category_id
+SELECT p.product_id, p.product_name, p.category_id
 FROM products p
-LEFT JOIN categories c
-    ON p.category_id = c.category_id
+LEFT JOIN categories c ON p.category_id = c.category_id
 WHERE p.category_id IS NOT NULL
-  AND c.category_id IS NULL;
-
+  AND c.category_id IS NULL
+ORDER BY p.product_id;
 
 -- 5. Inventory records referencing products that do not exist
-SELECT
-    il.log_id,
-    il.product_id,
-    il.change_qty,
-    il.reason
+SELECT il.log_id, il.product_id, il.change_qty, il.reason
 FROM inventory_log il
-LEFT JOIN products p
-    ON il.product_id = p.product_id
-WHERE p.product_id IS NULL;
-
+LEFT JOIN products p ON il.product_id = p.product_id
+WHERE p.product_id IS NULL
+ORDER BY il.log_id;
 
 -- 6. Categories referencing parent categories that do not exist
-SELECT
-    child.category_id,
-    child.category_name,
-    child.parent_id
+SELECT child.category_id, child.category_name, child.parent_id
 FROM categories child
-LEFT JOIN categories parent
-    ON child.parent_id = parent.category_id
+LEFT JOIN categories parent ON child.parent_id = parent.category_id
 WHERE child.parent_id IS NOT NULL
-  AND parent.category_id IS NULL;
-
+  AND parent.category_id IS NULL
+ORDER BY child.category_id;
 
 -- 7. Summary: Count orphan records in each relationship
 SELECT 'Orders without customers' AS issue, COUNT(*) AS affected_records
@@ -97,4 +75,14 @@ UNION ALL
 SELECT 'Inventory records without products', COUNT(*)
 FROM inventory_log il
 LEFT JOIN products p ON il.product_id = p.product_id
-WHERE p.product_id IS NULL;
+WHERE p.product_id IS NULL
+
+UNION ALL
+
+SELECT 'Categories without valid parent categories', COUNT(*)
+FROM categories child
+LEFT JOIN categories parent ON child.parent_id = parent.category_id
+WHERE child.parent_id IS NOT NULL
+  AND parent.category_id IS NULL
+
+ORDER BY issue;
