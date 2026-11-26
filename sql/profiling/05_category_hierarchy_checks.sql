@@ -1,3 +1,5 @@
+﻿-- FILE 05: CATEGORY HIERARCHY CHECKS
+
 -- 1. List products without a category.
 SELECT
     product_id,
@@ -21,15 +23,16 @@ FROM categories AS child
 LEFT JOIN categories AS parent
     ON child.parent_id = parent.category_id
 WHERE child.parent_id IS NOT NULL
-  AND parent.category_id IS NULL;
-
--- 4. List root categories (categories without a parent).
-SELECT
-    child.category_id,
-    child.category_name
-FROM categories AS child
-WHERE child.parent_id IS NULL
+  AND parent.category_id IS NULL
 ORDER BY child.category_id;
+
+-- 4. List root categories.
+SELECT
+    category_id,
+    category_name
+FROM categories
+WHERE parent_id IS NULL
+ORDER BY category_id;
 
 -- 5. Find categories that reference themselves.
 SELECT
@@ -37,27 +40,27 @@ SELECT
     category_name,
     parent_id
 FROM categories
-WHERE category_id = parent_id;
+WHERE category_id = parent_id
+ORDER BY category_id;
 
 -- 6. Count categories reachable from root categories.
 WITH RECURSIVE category_tree AS (
-    SELECT
-        category_id,
-        parent_id
+    SELECT category_id, parent_id
     FROM categories
     WHERE parent_id IS NULL
 
     UNION
 
-    SELECT
-        child.category_id,
-        child.parent_id
+    SELECT child.category_id, child.parent_id
     FROM categories AS child
     INNER JOIN category_tree AS tree
         ON child.parent_id = tree.category_id
 )
 SELECT
-    COUNT(DISTINCT category_id) AS categories_reachable_from_roots
+    (SELECT COUNT(*) FROM categories) AS total_categories,
+    COUNT(DISTINCT category_id) AS reachable_from_roots,
+    (SELECT COUNT(*) FROM categories)
+        - COUNT(DISTINCT category_id) AS unreachable_from_roots
 FROM category_tree;
 
 -- 7. Detect circular parent-child relationships.
