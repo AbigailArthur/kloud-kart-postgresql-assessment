@@ -5,42 +5,49 @@
 
 ## Overview
 
-The assessment reviewed Kloud Kart's inventory records, order information, and customer reports. Several issues were identified that could affect stock availability, record accuracy, and business decisions.
+The assessment reviewed Kloud Kart's inventory, orders, customer records, and reporting processes. It identified data-quality problems that could affect stock availability, order integrity, financial reconciliation, and business decisions.
 
-Improvements have also been developed and tested using the company's existing database, without requiring additional infrastructure.
+Database improvements were developed and tested against the supplied dataset using PostgreSQL, without requiring additional infrastructure.
 
 ## Key Findings
 
-- **Stock accuracy:** 14 products have negative stock quantities, while 120 stock movement records refer to products that do not exist.
-- **Order records:** 692 order items are linked to orders that cannot be found, and 210 orders are linked to customers who cannot be found.
-- **Sales figures:** 2,398 orders have recorded totals that do not match the calculated value of their items.
-- **Record keeping:** Almost all stock movement records lack explanations of why the changes occurred.
-- **Product categories:** Some category records have incorrect relationships, making product classification less reliable.
+- **Stock accuracy:** 14 products have negative stock quantities, and 120 inventory movements reference nonexistent products.
+- **Order integrity:** 692 order items reference nonexistent orders, while 210 orders reference nonexistent customers.
+- **Sales reconciliation:** 2,279 fully priced orders have discrepancies between their stored totals and calculated item values. Another 147 orders contain missing unit prices and cannot be reliably reconciled.
+- **Inventory record keeping:** 281,927 of 282,352 inventory records (99.85%) have missing notes, limiting the ability to explain stock movements.
+- **Product categories:** Three categories are unreachable from the hierarchy roots. The defects include a missing-parent reference and a circular relationship.
 
-These problems could lead to inaccurate reports, confusion about available stock, and difficulties tracking business activities.
+These findings represent risks requiring investigation. They do not, by themselves, establish financial losses or prove that every flagged record is incorrect.
 
-## Improvements Made
+## Improvements Developed
 
-1. **Better stock control:** Introduced a safer purchasing process that prevents customers from buying more units than are available.
-2. **Improved stock tracking:** Added a process for recording stock additions and corrections so changes can be traced.
-3. **Better low-stock visibility:** Developed a report that identifies products with low stock, including products under nested categories.
-4. **Improved customer reporting:** Developed a Monday report showing customer spending, order counts, monthly spending trends, and the top 100 customers.
+1. **Safer purchasing:** Implemented a database purchasing function designed to prevent overselling when customers compete for limited stock.
+2. **Stock adjustment tracking:** Implemented a controlled stock-adjustment function that records inventory changes and their reasons.
+3. **Low-stock visibility:** Developed a report that identifies low-stock products and includes their category paths, including nested categories.
+4. **Customer reporting:** Developed a Monday customer report covering spending, order counts, monthly spending trends, and the top 100 customers.
 
-The customer report completed in less than one second during testing.
+The complete customer report returned 310 monthly rows and completed in under one second during local testing. This is a test result, not a guarantee of production performance under peak traffic.
 
 ## Recommendations
 
-1. Investigate products with negative stock and correct inaccurate inventory records.
-2. Review incomplete order and customer records.
-3. Investigate differences between recorded order totals and calculated item values.
-4. Require staff to provide explanations whenever stock is added, removed, or corrected.
-5. Review and correct the product category structure.
-6. Ensure staff use the improved purchasing and stock adjustment processes consistently.
+1. Reconcile orphaned order items and orders with missing customer references against source transaction records.
+2. Investigate order total discrepancies and missing unit prices before making financial corrections.
+3. Review negative stock balances and invalid inventory references against the inventory movement history.
+4. Introduce meaningful notes for stock adjustments and other operationally important inventory movements.
+5. Approve a standard set of order statuses and consistent naming rules.
+6. Repair the category hierarchy and assign categories to the 37 uncategorized products.
+7. Review duplicate customer records and future-dated transactions before changing or deleting data.
 
 ## Limitations
 
-The improvements do not automatically correct existing inaccurate records. Some historical stock movements also lack enough information to connect them to specific orders. Existing records will therefore need further review.
+The database improvements do not automatically correct historical data. Existing records require investigation and approved business rules before corrections are applied.
+
+Some historical inventory movements lack sufficient information to connect them to specific orders. Order total differences may also reflect discounts, taxes, shipping charges, or adjustments not represented in the supplied tables.
+
+The performance results were obtained in a local test environment. Production behaviour under realistic flash-sale traffic remains to be verified.
 
 ## Conclusion
 
-The assessment has provided Kloud Kart with improved stock control, better stock tracking, and faster customer spending reports. Addressing the existing record-keeping issues and consistently following the recommended processes will help the business make more reliable decisions.
+The assessment provides Kloud Kart with improved database-level controls for purchasing and stock adjustments, better low-stock visibility, and a customer reporting solution.
+
+The next priority is to investigate the existing data-quality issues and introduce consistent operational procedures. Combining these improvements with verified source records will help Nana make more reliable inventory and customer-management decisions.
