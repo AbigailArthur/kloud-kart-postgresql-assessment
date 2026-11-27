@@ -1,4 +1,4 @@
-WITH monthly AS (
+﻿WITH monthly AS (
     SELECT
         customer_id,
         DATE_TRUNC('month', order_date) AS report_month,
@@ -19,7 +19,10 @@ totals AS (
     GROUP BY customer_id
 ),
 ranked AS (
-    SELECT *,
+    SELECT
+        customer_id,
+        total_spent,
+        order_count,
         ROW_NUMBER() OVER (
             ORDER BY total_spent DESC, customer_id
         ) AS customer_rank

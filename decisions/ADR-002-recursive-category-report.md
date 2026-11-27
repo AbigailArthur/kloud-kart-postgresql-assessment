@@ -1,4 +1,4 @@
-# ADR-002: Recursive Category Reporting
+﻿# ADR-002: Recursive Category Reporting
 
 **Status:** Accepted
 
@@ -19,7 +19,7 @@ Use a PostgreSQL recursive CTE in `low_stock_products()`.
 
 The function:
 
-- Traverses categories from root nodes without hardcoding hierarchy depth.
+- Starts from each product's assigned category and follows parent links upward without hardcoding hierarchy depth.
 - Tracks visited category IDs to prevent infinite recursion.
 - Identifies category cycles and missing-parent relationships.
 - Includes products without category assignments as `Uncategorized`.
@@ -41,6 +41,9 @@ The function:
 - The function reports structural problems but does not automatically repair incorrect category relationships.
 - Invalid parent references and cycles still require business review.
 
+## Cost if the Decision Is Wrong
+
+If the hierarchy traversal is incorrect, Kloud Kart could receive incomplete or misleading category paths in low-stock reports. Products may be associated with the wrong category, and circular relationships could prevent reports from completing correctly. This could lead to poor stock-management and replenishment decisions.
 ## Validation
 
 The function returned 1,685 low-stock products for the tested threshold.

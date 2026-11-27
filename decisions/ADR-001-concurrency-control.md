@@ -46,6 +46,9 @@ The stock deduction and related order records must succeed or fail together.
 - The function must be maintained as the purchasing workflow evolves.
 
 If the application bypasses this function, the database protection cannot be assumed to apply to that purchasing operation.
+## Cost if the Decision Is Wrong
+
+If this control fails or purchasing operations bypass the function, Kloud Kart could accept orders for stock that is no longer available. This could lead to cancelled orders, customer dissatisfaction, refunds, and additional fulfilment work. During a flash sale, the impact could affect many customers at once.
 
 ## Validation
 

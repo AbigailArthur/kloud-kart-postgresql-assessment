@@ -21,22 +21,22 @@ These findings represent risks requiring investigation. They do not, by themselv
 
 ## Improvements Developed
 
-1. **Safer purchasing:** Implemented a database purchasing function designed to prevent overselling when customers compete for limited stock.
-2. **Stock adjustment tracking:** Implemented a controlled stock-adjustment function that records inventory changes and their reasons.
+1. **Safer purchasing:** Implemented a database purchasing function that uses atomic stock updates to prevent overselling when customers compete for limited stock.
+2. **Stock adjustment tracking:** Implemented a controlled stock-adjustment function that updates stock quantities and records inventory movements with their reasons.
 3. **Low-stock visibility:** Developed a report that identifies low-stock products and includes their category paths, including nested categories.
-4. **Customer reporting:** Developed a Monday customer report covering spending, order counts, monthly spending trends, and the top 100 customers.
+4. **Customer reporting:** Developed a Monday customer report covering spending, order counts, monthly spending trends, cumulative spending, and the top 100 customers.
 
-The complete customer report returned 310 monthly rows and completed in under one second during local testing. This is a test result, not a guarantee of production performance under peak traffic.
+The customer report returned 310 monthly rows and completed in under one second during local testing. This is a measured test result, not a guarantee of production performance under peak traffic.
 
 ## Recommendations
 
 1. Reconcile orphaned order items and orders with missing customer references against source transaction records.
 2. Investigate order total discrepancies and missing unit prices before making financial corrections.
 3. Review negative stock balances and invalid inventory references against the inventory movement history.
-4. Introduce meaningful notes for stock adjustments and other operationally important inventory movements.
+4. Require meaningful notes for future stock adjustments and other operationally important inventory movements.
 5. Approve a standard set of order statuses and consistent naming rules.
 6. Repair the category hierarchy and assign categories to the 37 uncategorized products.
-7. Review duplicate customer records and future-dated transactions before changing or deleting data.
+7. Review potential duplicate customer records and future-dated transactions before changing or deleting data.
 
 ## Limitations
 

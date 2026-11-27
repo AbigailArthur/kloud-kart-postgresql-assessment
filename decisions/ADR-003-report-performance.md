@@ -1,4 +1,4 @@
-# ADR-003: Monday Customer Report Performance
+﻿# ADR-003: Monday Customer Report Performance
 
 **Status:** Accepted
 
@@ -32,7 +32,7 @@ The report:
 - Uses window functions to derive running totals and customer rankings.
 - Returns the top 100 customers and their monthly reporting rows.
 
-A partial covering index on completed orders was also added to support the report query.
+A partial covering index on completed orders was tested but not retained because it did not improve total execution time.
 
 ## Consequences and Trade-offs
 
@@ -41,7 +41,7 @@ A partial covering index on completed orders was also added to support the repor
 - Avoids repeating the monthly aggregation.
 - Keeps reporting calculations in PostgreSQL.
 - Produces customer-level and monthly metrics in one report query.
-- The partial covering index enables an index-only scan in the tested execution plan.
+- Benchmarking confirmed that the index enabled an index-only scan, but this did not translate into faster complete-report execution.
 
 **Costs and risks:**
 
@@ -52,6 +52,9 @@ A partial covering index on completed orders was also added to support the repor
 
 The index is retained in the current implementation, but its continued value should be reviewed using production measurements. If it provides no operational benefit, removing it may reduce unnecessary index-maintenance overhead.
 
+## Cost if the Decision Is Wrong
+
+If the reporting approach becomes inefficient as data volume grows, customer reports could take longer to complete and delay business decisions. Retaining ineffective indexes could also increase storage and maintenance overhead without improving report performance.
 ## Validation
 
 Testing used 159,384 orders and 336,559 order items.
