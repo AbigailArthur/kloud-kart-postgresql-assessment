@@ -1,4 +1,4 @@
-﻿# Kloud Kart PostgreSQL Assessment
+# Kloud Kart PostgreSQL Assessment
 
 A PostgreSQL database engineering project focused on building, validating, and improving the data operations of a fictional e-commerce business, Kloud Kart.
 

@@ -1,4 +1,4 @@
-﻿-- FILE 01: NULL / MISSING VALUE CHECKS
+-- FILE 01: NULL / MISSING VALUE CHECKS
 -- Checks SQL NULLs and blank text values.
 
 -- 1. Categories

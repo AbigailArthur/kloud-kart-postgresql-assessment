@@ -1,4 +1,4 @@
-﻿-- FILE 06: STATUS, INVENTORY NOTES AND DATE CHECKS
+-- FILE 06: STATUS, INVENTORY NOTES AND DATE CHECKS
 -- Assessment reference date: 27 November 2026.
 
 -- 1. List all distinct raw order statuses.

@@ -1,4 +1,4 @@
-﻿-- FILE 05: CATEGORY HIERARCHY CHECKS
+-- FILE 05: CATEGORY HIERARCHY CHECKS
 
 -- 1. List products without a category.
 SELECT

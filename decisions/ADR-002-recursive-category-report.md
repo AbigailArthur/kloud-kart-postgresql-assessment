@@ -1,4 +1,4 @@
-﻿# ADR-002: Recursive Category Reporting
+# ADR-002: Recursive Category Reporting
 
 **Status:** Accepted
 

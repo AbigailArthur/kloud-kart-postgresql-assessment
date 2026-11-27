@@ -1,4 +1,4 @@
-﻿-- 1. Find products with negative stock
+-- 1. Find products with negative stock
 SELECT
     product_id,
     product_name,

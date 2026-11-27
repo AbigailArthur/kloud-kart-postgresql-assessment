@@ -1,4 +1,4 @@
-﻿
+
 # Additional Improvement: Reusable SQL Data Profiling Toolkit
 
 ## Overview

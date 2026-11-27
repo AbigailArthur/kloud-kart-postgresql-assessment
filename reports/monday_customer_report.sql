@@ -1,10 +1,11 @@
-﻿WITH monthly AS (
+WITH monthly AS (
     SELECT
         customer_id,
         DATE_TRUNC('month', order_date) AS report_month,
         SUM(total_amount) AS monthly_spend,
         COUNT(*) AS monthly_order_count
     FROM orders
+    -- Treat 'completed' and 'complete' as equivalent source-system status labels.
     WHERE LOWER(BTRIM(status)) IN ('completed', 'complete')
       AND order_date >= CURRENT_DATE - INTERVAL '12 months'
       AND order_date < CURRENT_DATE + INTERVAL '1 day'
