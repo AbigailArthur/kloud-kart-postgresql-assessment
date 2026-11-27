@@ -1,3 +1,10 @@
+
+-- ============================================================
+-- 04. DATA CONSISTENCY CHECKS
+-- Kloud-Kart PostgreSQL Assessment
+-- ============================================================
+
+
 -- 1. Find products with negative stock
 SELECT
     product_id,
@@ -91,4 +98,51 @@ SELECT
     reason
 FROM inventory_log
 WHERE change_qty = 0
+ORDER BY log_id;
+
+
+-- 8. Count products with negative stock
+SELECT
+    COUNT(*) AS products_with_negative_stock
+FROM products
+WHERE stock_quantity < 0;
+
+
+-- 9. Count order items with non-positive quantities
+SELECT
+    COUNT(*) AS order_items_with_nonpositive_quantity
+FROM order_items
+WHERE quantity <= 0;
+
+
+-- 10. Count order items with non-positive unit prices
+SELECT
+    COUNT(*) AS order_items_with_nonpositive_unit_price
+FROM order_items
+WHERE unit_price <= 0;
+
+
+-- 11. Find sale inventory movements with positive quantities
+--     These may indicate incorrectly classified movements.
+SELECT
+    log_id,
+    product_id,
+    change_qty,
+    reason
+FROM inventory_log
+WHERE LOWER(BTRIM(reason)) = 'sale'
+  AND change_qty > 0
+ORDER BY log_id;
+
+
+-- 12. Find non-sale inventory movements with negative quantities
+--     These may indicate incorrectly classified movements.
+SELECT
+    log_id,
+    product_id,
+    change_qty,
+    reason
+FROM inventory_log
+WHERE LOWER(BTRIM(reason)) <> 'sale'
+  AND change_qty < 0
 ORDER BY log_id;

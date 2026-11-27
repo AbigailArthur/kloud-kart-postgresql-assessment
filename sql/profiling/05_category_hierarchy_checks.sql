@@ -1,6 +1,11 @@
--- FILE 05: CATEGORY HIERARCHY CHECKS
 
--- 1. List products without a category.
+-- ============================================================
+-- 05. CATEGORY HIERARCHY CHECKS
+-- Kloud-Kart PostgreSQL Assessment
+-- ============================================================
+
+
+-- 1. List products without a category
 SELECT
     product_id,
     product_name
@@ -8,13 +13,15 @@ FROM products
 WHERE category_id IS NULL
 ORDER BY product_id;
 
--- 2. Count products without a category.
+
+-- 2. Count products without a category
 SELECT
     COUNT(*) AS uncategorized_products
 FROM products
 WHERE category_id IS NULL;
 
--- 3. Find categories referencing a parent that does not exist.
+
+-- 3. Find categories referencing a parent that does not exist
 SELECT
     child.category_id,
     child.category_name,
@@ -26,7 +33,8 @@ WHERE child.parent_id IS NOT NULL
   AND parent.category_id IS NULL
 ORDER BY child.category_id;
 
--- 4. List root categories.
+
+-- 4. List root categories
 SELECT
     category_id,
     category_name
@@ -34,7 +42,8 @@ FROM categories
 WHERE parent_id IS NULL
 ORDER BY category_id;
 
--- 5. Find categories that reference themselves.
+
+-- 5. Find categories that reference themselves
 SELECT
     category_id,
     category_name,
@@ -43,15 +52,20 @@ FROM categories
 WHERE category_id = parent_id
 ORDER BY category_id;
 
--- 6. Count categories reachable from root categories.
+
+-- 6. Count categories reachable from root categories
 WITH RECURSIVE category_tree AS (
-    SELECT category_id, parent_id
+    SELECT
+        category_id,
+        parent_id
     FROM categories
     WHERE parent_id IS NULL
 
     UNION
 
-    SELECT child.category_id, child.parent_id
+    SELECT
+        child.category_id,
+        child.parent_id
     FROM categories AS child
     INNER JOIN category_tree AS tree
         ON child.parent_id = tree.category_id
@@ -63,7 +77,9 @@ SELECT
         - COUNT(DISTINCT category_id) AS unreachable_from_roots
 FROM category_tree;
 
--- 7. Detect circular parent-child relationships.
+
+-- 7. Detect circular parent-child relationships
+--    Report the categories that are actual members of a cycle.
 WITH RECURSIVE category_walk AS (
     SELECT
         category_id AS start_id,
@@ -88,7 +104,12 @@ WITH RECURSIVE category_walk AS (
       AND NOT walk.has_cycle
 )
 SELECT DISTINCT
-    start_id AS category_id_with_cycle
-FROM category_walk
-WHERE has_cycle
-ORDER BY start_id;
+    cycle_member.category_id,
+    cycle_member.category_name,
+    cycle_member.parent_id
+FROM category_walk AS walk
+INNER JOIN categories AS cycle_member
+    ON cycle_member.category_id = ANY(walk.visited)
+WHERE walk.has_cycle
+  AND cycle_member.category_id = walk.category_id
+ORDER BY cycle_member.category_id;

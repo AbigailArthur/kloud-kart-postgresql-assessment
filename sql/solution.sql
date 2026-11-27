@@ -1,4 +1,4 @@
-﻿-- KLOUD KART: PostgreSQL database solution
+-- KLOUD KART: PostgreSQL database solution
 --
 -- This script provides:
 --   1. Safe ID generation for existing and new records.
@@ -460,3 +460,76 @@ AS $$
         ls.stock_quantity,
         ls.product_id;
 $$;
+-- DATA INTEGRITY CONSTRAINTS
+--
+-- Added after the original data load so existing data-quality
+-- violations remain available for assessment.
+-- NOT VALID skips checking existing rows but enforces these
+-- constraints on new or updated rows.
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'fk_order_items_order'
+          AND conrelid = 'order_items'::regclass
+    ) THEN
+        ALTER TABLE order_items
+        ADD CONSTRAINT fk_order_items_order
+        FOREIGN KEY (order_id)
+        REFERENCES orders(order_id)
+        NOT VALID;
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'fk_order_items_product'
+          AND conrelid = 'order_items'::regclass
+    ) THEN
+        ALTER TABLE order_items
+        ADD CONSTRAINT fk_order_items_product
+        FOREIGN KEY (product_id)
+        REFERENCES products(product_id)
+        NOT VALID;
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'fk_inventory_log_product'
+          AND conrelid = 'inventory_log'::regclass
+    ) THEN
+        ALTER TABLE inventory_log
+        ADD CONSTRAINT fk_inventory_log_product
+        FOREIGN KEY (product_id)
+        REFERENCES products(product_id)
+        NOT VALID;
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'chk_products_stock_nonnegative'
+          AND conrelid = 'products'::regclass
+    ) THEN
+        ALTER TABLE products
+        ADD CONSTRAINT chk_products_stock_nonnegative
+        CHECK (stock_quantity >= 0)
+        NOT VALID;
+    END IF;
+END;
+$$;
+
+COMMENT ON CONSTRAINT fk_order_items_order ON order_items
+IS 'Prevents new or updated order items from referencing nonexistent orders.';
+
+COMMENT ON CONSTRAINT fk_order_items_product ON order_items
+IS 'Prevents new or updated order items from referencing nonexistent products.';
+
+COMMENT ON CONSTRAINT fk_inventory_log_product ON inventory_log
+IS 'Prevents new or updated inventory movements from referencing nonexistent products.';
+
+COMMENT ON CONSTRAINT chk_products_stock_nonnegative ON products
+IS 'Prevents new or updated products from having negative stock quantities.';
